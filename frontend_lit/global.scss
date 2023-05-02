@@ -1,0 +1,24 @@
+:root{
+    --background-color: #0d1117;
+    --text-color: white;
+    --accent-color: #7d8590;
+    --secondary-background-color: #161b22;
+    --secondary-accent-color: #30363d;
+  }
+  
+  [data-theme="light"]{
+    --background-color: white;
+    --text-color: black;
+    --accent-color: #d0d7de;
+    --secondary-background-color: #f6f8fa;
+    --secondary-accent-color: #d0d7de;
+  }
+body{
+    background-color: var(--background-color);
+    color: var(--text-color);
+    font-family: 'Segoe UI';
+}
+
+* {
+    transition: color 200ms, background 200ms, border 200ms;
+}

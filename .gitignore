@@ -1,0 +1,5 @@
+obj/
+bin/
+.parcel-cache/
+dist/
+node_modules/
