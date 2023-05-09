@@ -24,6 +24,7 @@ namespace ToDoAPI.Models
                 Title = dto.Title,
                 Content = dto.Content,
                 IsCompleted = false,
+                CreationDate = DateTime.Now.ToUniversalTime(),
             };
             AddToDo(toDo);
             await _context.SaveChangesAsync();
@@ -49,7 +50,7 @@ namespace ToDoAPI.Models
             return null;
         }
 
-        public async Task<IEnumerable<ToDo>> GetAll() => await _context.ToDos.OrderBy(c => c.Id).ToListAsync();
+        public async Task<IEnumerable<ToDo>> GetAll() => await _context.ToDos.OrderByDescending(t => t.CreationDate).ToListAsync();
 
         public async Task DeleteToDo(Guid id)
         {
