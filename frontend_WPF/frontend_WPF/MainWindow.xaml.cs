@@ -1,7 +1,9 @@
 ﻿using Microsoft.VisualBasic;
 using System;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -14,6 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Xml.Linq;
+using System.Net;
 
 namespace frontend_WPF
 {
@@ -22,24 +25,37 @@ namespace frontend_WPF
     /// </summary>
     public partial class MainWindow : Window
     {
+        
+        
         private FlowDocument flowdoc;
-        public MainWindow()
+        private ToDoList TodoList = new ToDoList();
+        static async Task<List<ToDo>> getTodos()
         {
-            InitializeComponent();
+            using var client = new HttpClient();
 
-            flowdoc = flowDocumentReader.Document;
-            flowdoc.FontFamily = new FontFamily("Comic Sans MS");
+            HttpResponseMessage response = await client.GetAsync("http://localhost:5161/api/todo");
+
+            if (response.IsSuccessStatusCode)
+            {
+                string jsonString = await response.Content.ReadAsStringAsync();
+                Console.WriteLine(jsonString);
+
+                List<ToDo> data = JsonConvert.DeserializeObject<List<ToDo>>(jsonString);
+                return data;
+            }
+            else
+            {
+                Console.WriteLine("Error: " + response.StatusCode);
+                throw new Exception("Failed to retrieve todos from API. Status code: " + response.StatusCode);
+            }
         }
-        private void Button_Click(object sender, RoutedEventArgs e)
+        public void addRow(string title,  string content, TableRowGroup rowGroup)
         {
-            Table todoTable = flowdoc.FindName("todotable") as Table;
-            TableRowGroup rowGroup = todoTable.FindName("group") as TableRowGroup;
-
             TableRow newRow = new TableRow();
-            rowGroup.Rows.Add(newRow);
+            rowGroup.Rows.Insert(0, newRow);
 
-            TableCell titleCell = new TableCell(new Paragraph(new Run(txtTitle.Text)));
-            TableCell contentCell = new TableCell(new Paragraph(new Run(txtContent.Text)));
+            TableCell titleCell = new TableCell(new Paragraph(new Run(title)));
+            TableCell contentCell = new TableCell(new Paragraph(new Run(content)));
 
             titleCell.BorderBrush = Brushes.Black;
             titleCell.BorderThickness = new Thickness(0, 0, 0, 1);
@@ -48,6 +64,35 @@ namespace frontend_WPF
 
             newRow.Cells.Add(titleCell);
             newRow.Cells.Add(contentCell);
+        }
+        public async void drawTable()
+        {
+            List<ToDo> todos = await getTodos();
+            TodoList.Todos = todos;
+
+            Table todoTable = flowdoc.FindName("todotable") as Table;
+            TableRowGroup rowGroup = todoTable.FindName("group") as TableRowGroup;
+            foreach(ToDo todo in TodoList.Todos)
+            {
+                addRow(todo.Title, todo.Content, rowGroup);
+            }
+
+        }
+        public MainWindow()
+        {
+            InitializeComponent();
+            drawTable();
+
+            flowdoc = flowDocumentReader.Document;
+            flowdoc.FontFamily = new FontFamily("Comic Sans MS");
+        }
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            TodoList.add(txtTitle.Text, txtContent.Text);
+
+            Table todoTable = flowdoc.FindName("todotable") as Table;
+            TableRowGroup rowGroup = todoTable.FindName("group") as TableRowGroup;
+            addRow(txtTitle.Text, txtContent.Text, rowGroup);
         }
     }
     
