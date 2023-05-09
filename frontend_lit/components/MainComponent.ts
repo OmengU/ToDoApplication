@@ -83,7 +83,7 @@ export class MainComponent extends LitElement {
   handleAddEvent(event: CustomEvent) {
     const newToDo = event.detail;
     console.log("handling add event");
-    this.todos = [...this.todos, newToDo];
+    this.todos = [newToDo, ...this.todos];
     //this.showAddThing = false;
   }
   async handleDeleteEvent(event: CustomEvent){

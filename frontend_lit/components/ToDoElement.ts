@@ -59,10 +59,21 @@ export class ToDoElement extends LitElement{
       }
       #check:hover{
         background-color: #2196f3;
-        border: none;
+        border: 2px solid #2196f3;
+        transition: background-color 400ms, border 400ms;
       }
       #check:disabled{
         background-color: grey;
+      }
+      #delete:hover{
+        background-color: #f92f60;
+        border-radius: 15px;
+        color: transparent;
+        text-shadow: 0 0 0 white;
+        transition: background-color 400ms, color 600ms, text-shadow 600ms, border-radius 400ms;
+      }
+      #delete{
+        transition: background-color 400ms, color 600ms, text-shadow 600ms, border-radius 400ms;
       }
     @media (max-width: 480px) {
         .container {
@@ -104,7 +115,7 @@ export class ToDoElement extends LitElement{
             <p class="content">${this.content}</p>
             </div>
             <div class="todo-actions">
-            <button @click="${() => {this.dispatchEvent(new CustomEvent('delete-event', { detail: this.id , bubbles: true, composed: true}))}}">❌</button>
+            <button id="delete" @click="${() => {this.dispatchEvent(new CustomEvent('delete-event', { detail: this.id , bubbles: true, composed: true}))}}">❌</button>
             <input id="check" type="checkbox" .checked=${this.iscompleted} ?disabled=${this.isdisabled} @change=${this.handlecheck}>
             </div>
         </div>
