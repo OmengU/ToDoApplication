@@ -1,6 +1,8 @@
 obj/
 bin/
 .vs/
+backend/.vs
+frontend_WPF/.vs
 .parcel-cache/
 dist/
 node_modules/
