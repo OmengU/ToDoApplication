@@ -92,10 +92,23 @@ export class ToDoElement extends LitElement{
         border-radius: 15px;
         color: transparent;
         text-shadow: 0 0 0 white;
-        transition: background-color 400ms, color 600ms, text-shadow 600ms, border-radius 400ms;
+        transition: background-color 400ms, color 400ms, text-shadow 600ms, border-radius 400ms;
       }
-      #delete{
-        transition: background-color 400ms, color 600ms, text-shadow 600ms, border-radius 400ms;
+      #delete, .edit{
+        transition: background-color 200ms, color 400ms, text-shadow 600ms, border-radius 400ms;
+      }
+      .edit{
+        margin-right: .4rem
+      }
+      #sendEdit:hover{
+        filter: invert(var(--color-invert)) hue-rotate(var(--color-rotate));  
+      }
+      .edit:hover{
+        background-color: #00d26a;
+        border-radius: 15px;
+        color: transparent;
+        text-shadow: 0 0 0 white;
+        transition: background-color 400ms, color 400ms, text-shadow 600ms, border-radius 400ms;
       }
     @media (max-width: 480px) {
         .container {
@@ -118,7 +131,7 @@ export class ToDoElement extends LitElement{
           }
       }
       *{
-        transition: background 200ms, color 200ms, border 200ms;
+        transition: background 200ms, color 200ms, border 200ms, filter 150ms;
       }
     `
     @property({type: String}) title: string = "";
@@ -162,7 +175,6 @@ export class ToDoElement extends LitElement{
           <div class="title-container">
           <p class="title">${this.title}</p>
           <div class="editButtons">
-          <button class="sendEdit">✅</button>
           <button class="edit" @click="${() => {this.handleToggleEdit()}}">${this.isediting === false ? '✏️' : '❌'}</button>
           </div>
           </div>
@@ -176,7 +188,7 @@ export class ToDoElement extends LitElement{
           this.title = (event.target as HTMLInputElement).value;
           }}">
           <div class="editButtons">
-          <button class="sendEdit" type="submit">✅</button>
+          <button id="sendEdit" type="submit">✅</button>
           <button class="edit" @click="${() => {this.handleToggleEdit()}}">❌</button>
           </div>
           </div>

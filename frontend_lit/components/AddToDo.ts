@@ -58,6 +58,9 @@ export class AddToDo extends LitElement{
       flex-direction: column;
       justify-content: flex-end;
     }
+    button:hover{
+      filter: invert(var(--color-invert)) hue-rotate(var(--color-rotate));  
+    }
     @media (max-width: 480px) {
       .container{
         grid-template-columns: 1fr;
@@ -71,7 +74,7 @@ export class AddToDo extends LitElement{
       }
     }
     *{
-      transition: background 200ms, color 200ms, border 200ms;
+      transition: background 200ms, color 200ms, border 200ms, filter 150ms;
     }
     `;
 
@@ -80,9 +83,11 @@ export class AddToDo extends LitElement{
 
     async handleSubmit(event: SubmitEvent) {
         event.preventDefault();
-        const data = await createToDo({title: this.title, content: this.content});
-        console.log(typeof data);
-        this.dispatchEvent(new CustomEvent('add-event', { detail: data }));
+        if(this.title.length > 0 && this.content.length > 0){
+          const data = await createToDo({title: this.title, content: this.content});
+          console.log(typeof data);
+          this.dispatchEvent(new CustomEvent('add-event', { detail: data }));
+        }
     }
 
 render() {

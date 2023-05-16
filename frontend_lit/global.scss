@@ -4,6 +4,8 @@
     --accent-color: #7d8590;
     --secondary-background-color: #161b22;
     --secondary-accent-color: #30363d;
+    --color-rotate: 270deg;
+    --color-invert: 100%;
   }
   
   [data-theme="light"]{
@@ -12,6 +14,8 @@
     --accent-color: #d0d7de;
     --secondary-background-color: #f6f8fa;
     --secondary-accent-color: #d0d7de;
+    --color-rotate: 90deg;
+    --color-invert: 0%;
   }
 body{
     background-color: var(--background-color);
