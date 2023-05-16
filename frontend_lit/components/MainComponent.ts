@@ -16,7 +16,7 @@ async function deleteToDo(id: string){
 }
 
 async function setCompletedToDo(id: string){
-  fetch(`${URL}/${id}`, {
+  fetch(`${URL}/${id}/complete`, {
   method: 'PATCH',
   headers: {
     'Content-Type': 'application/json'

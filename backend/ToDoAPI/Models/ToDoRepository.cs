@@ -49,6 +49,20 @@ namespace ToDoAPI.Models
             }
             return null;
         }
+        public async Task<ToDo> ChangeData(Guid id, ToDoDto dto)
+        {
+            ToDo newToDo = await _context.ToDos.FirstOrDefaultAsync(p => p.Id == id);
+
+            if (newToDo != null)
+            {
+                newToDo.Title = dto.Title;
+                newToDo.Content = dto.Content;
+
+                await _context.SaveChangesAsync();
+                return newToDo;
+            }
+            return null;
+        }
 
         public async Task<IEnumerable<ToDo>> GetAll() => await _context.ToDos.OrderByDescending(t => t.CreationDate).ToListAsync();
 

@@ -72,7 +72,7 @@ namespace ToDoAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpPatch("{id}")]
+        [HttpPatch("{id}/complete")]
         public async Task<ActionResult<ToDo>> SetCompleted (Guid id)
         {
             try
@@ -85,6 +85,24 @@ namespace ToDoAPI.Controllers
                 await _repository.SetCompleted(id);
                 return Ok(todo);
             }catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPatch("{id}")]
+        public async Task<ActionResult<ToDo>> ChangeData(Guid id, [FromBody] ToDoDto dto)
+        {
+            try
+            {
+                var todo = await _repository.ChangeData(id, dto);
+                if (todo == null)
+                {
+                    return NotFound();
+                }
+                await _repository.SetCompleted(id);
+                return Ok(todo);
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
