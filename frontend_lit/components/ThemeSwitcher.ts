@@ -18,13 +18,13 @@ export class ThemeSwitcher extends LitElement {
   }
   `;
 
-  @property({ type: Object })
-  private currentTheme: string = loadTheme();
+  @property({ type: Object }) private currentTheme: string = loadTheme();
 
   private switchTheme() {
     const newTheme = this.currentTheme === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', newTheme);
     this.currentTheme = newTheme;
+    console.log("theme changed to " + this.currentTheme);
     localStorage.setItem('theme', JSON.stringify(newTheme));
     document.body.setAttribute('data-theme', newTheme);
   }

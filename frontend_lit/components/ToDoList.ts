@@ -1,6 +1,6 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-import {ToDo, URL} from './global'
+import {ToDo} from './global'
 
 @customElement("todo-list")
 export class ToDoList extends LitElement{
@@ -23,10 +23,7 @@ export class ToDoList extends LitElement{
             transition: border 200ms;
         }
         `
-    
-
-    @property()
-    todos : ToDo[] = [];
+    @property() todos : ToDo[] = [];
 
     render(){
     return html`

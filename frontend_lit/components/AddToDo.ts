@@ -85,27 +85,24 @@ export class AddToDo extends LitElement{
         event.preventDefault();
         if(this.title.length > 0 && this.content.length > 0){
           const data = await createToDo({title: this.title, content: this.content});
-          console.log(typeof data);
           this.dispatchEvent(new CustomEvent('add-event', { detail: data }));
+          this.title = "";
+          this.content = "";
         }
     }
 
 render() {
     return html`
     <form @submit="${this.handleSubmit}">
-    <div class="container">
-    <div class="text-fields">
-    <input type="text" placeholder="title" .value="${this.title}" @input="${(event: Event) => {
-      this.title = (event.target as HTMLInputElement).value;
-    }}">
-    <textarea type="text" placeholder="content" .value="${this.content}" @input="${(event: Event) => {
-      this.content = (event.target as HTMLInputElement).value;
-    }}" @keyup="${(e: KeyboardEvent) => { if (e.key === 'Enter') { this.handleSubmit } }}"></textarea>
-    </div>
-    <div class="button">
-    <button type="submit">✅</button>
-  </div>
-  </div>
+      <div class="container">
+        <div class="text-fields">
+          <input type="text" placeholder="title" .value="${this.title}" @input="${(event: Event) => {this.title = (event.target as HTMLInputElement).value;}}">
+          <textarea type="text" placeholder="content" .value="${this.content}" @input="${(event: Event) => {this.content = (event.target as HTMLInputElement).value;}}" @keyup="${(e: KeyboardEvent) => { if (e.key === 'Enter') { this.handleSubmit } }}"></textarea>
+        </div>
+        <div class="button">
+          <button type="submit">✅</button>
+        </div>
+      </div>
     </form>
     `
 }

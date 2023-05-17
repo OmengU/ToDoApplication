@@ -1,6 +1,5 @@
-import {LitElement, html, css, CSSResultGroup} from 'lit';
+import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-import { CSS } from './global';
 
 @customElement("todo-element")
 export class ToDoElement extends LitElement{
@@ -64,6 +63,9 @@ export class ToDoElement extends LitElement{
         font-size: 1rem;
         width: 100%;
       }
+      .editButtons{
+        display: flex;
+      }
       #check{
         height: 1.5rem;
         width: 1.5rem;
@@ -94,8 +96,8 @@ export class ToDoElement extends LitElement{
         text-shadow: 0 0 0 white;
         transition: background-color 400ms, color 400ms, text-shadow 600ms, border-radius 400ms;
       }
-      #delete, .edit{
-        transition: background-color 200ms, color 400ms, text-shadow 600ms, border-radius 400ms;
+      #delete{
+        transition: background-color 10ms, color 400ms, text-shadow 600ms, border-radius 400ms;
       }
       .edit{
         margin-right: .4rem
@@ -104,11 +106,8 @@ export class ToDoElement extends LitElement{
         filter: invert(var(--color-invert)) hue-rotate(var(--color-rotate));  
       }
       .edit:hover{
-        background-color: #00d26a;
-        border-radius: 15px;
-        color: transparent;
-        text-shadow: 0 0 0 white;
-        transition: background-color 400ms, color 400ms, text-shadow 600ms, border-radius 400ms;
+        filter: invert(100%) hue-rotate(90deg);
+        transition: filter 400ms;
       }
     @media (max-width: 480px) {
         .container {
@@ -155,54 +154,44 @@ export class ToDoElement extends LitElement{
       this.isediting = !this.isediting;
     }
 
-
     handlecheck(){
         this.dispatchEvent(new CustomEvent("check-event", {detail: this.id, bubbles: true, composed: true}));
         this.isdisabled = true;
     }
     handleEdit(event: SubmitEvent) {
       event.preventDefault();
-      this.dispatchEvent(new CustomEvent('add-event', { detail: {id: this.id, title: this.title, content: this.content} }));
+      this.dispatchEvent(new CustomEvent('edit-event', {detail: {id: this.id, title: this.title, content: this.content}, bubbles: true, composed: true }));
       this.isediting = false;
   }
 
     render() {
       if(this.iscompleted == true) this.isdisabled = true;
         return html `
-        <div class="container">
-          ${this.isediting == false ? html`
+        <div class="container"> ${this.isediting == false ? html`
           <div class="todo-contents">
-          <div class="title-container">
-          <p class="title">${this.title}</p>
-          <div class="editButtons">
-          <button class="edit" @click="${() => {this.handleToggleEdit()}}">${this.isediting === false ? '✏️' : '❌'}</button>
-          </div>
-          </div>
-          <p class="content">${this.content}</p>
-          </div>
-          `: html`
+            <div class="title-container">
+              <p class="title">${this.title}</p>
+              <button class="edit" @click="${() => {this.handleToggleEdit()}}">${this.isediting === false ? '✏️' : '❌'}</button>
+            </div>
+            <p class="content">${this.content}</p>
+          </div> `: html`
           <form @submit="${this.handleEdit}">
-          <div class="todo-contents">
-          <div class="title-container">
-          <input type="text" placeholder="title" .value="${this.title}" @input="${(event: Event) => {
-          this.title = (event.target as HTMLInputElement).value;
-          }}">
-          <div class="editButtons">
-          <button id="sendEdit" type="submit">✅</button>
-          <button class="edit" @click="${() => {this.handleToggleEdit()}}">❌</button>
-          </div>
-          </div>
-          <textarea type="text" placeholder="content" .value="${this.content}" @input="${(event: Event) => {
-          this.content = (event.target as HTMLInputElement).value;
-          }}" @keyup="${(e: KeyboardEvent) => { if (e.key === 'Enter') { this.handleEdit } }}"></textarea>
-          </div>
-          </form>
-          `}
-            <div class="todo-actions">
+            <div class="todo-contents">
+              <div class="title-container">
+                <input type="text" placeholder="title" .value="${this.title}" @input="${(event: Event) => {this.title = (event.target as HTMLInputElement).value;}}">
+                <div class="editButtons">
+                  <button id="sendEdit" type="submit">✅</button>
+                  <button class="edit" @click="${() => {this.handleToggleEdit()}}">❌</button>
+                </div>
+              </div>
+              <textarea type="text" placeholder="content" .value="${this.content}" @input="${(event: Event) => {this.content = (event.target as HTMLInputElement).value;}}" @keyup="${(e: KeyboardEvent) => { if (e.key === 'Enter') { this.handleEdit } }}"></textarea>
+            </div>
+          </form> `}
+          <div class="todo-actions">
             <button id="delete" @click="${() => {this.dispatchEvent(new CustomEvent('delete-event', { detail: this.id , bubbles: true, composed: true}))}}">❌</button>
             <input id="check" type="checkbox" .checked=${this.iscompleted} ?disabled=${this.isdisabled} @change=${this.handlecheck}>
             </div>
-        </div>
+          </div>
         `;
     }
 }
