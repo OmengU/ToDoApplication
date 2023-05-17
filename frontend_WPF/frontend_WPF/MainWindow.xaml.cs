@@ -17,12 +17,11 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Xml.Linq;
 using System.Net;
+using System.Windows.Controls.Primitives;
+using System.Windows.Markup;
 
 namespace frontend_WPF
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         
@@ -31,6 +30,7 @@ namespace frontend_WPF
         private ToDoList TodoList = new ToDoList();
         private SolidColorBrush background = new SolidColorBrush(Color.FromRgb(13, 17, 23));
         private SolidColorBrush secondary = new SolidColorBrush(Color.FromRgb(22, 27, 34));
+        private SolidColorBrush border = new SolidColorBrush(Color.FromRgb(145, 126, 126));
         static async Task<List<ToDo>> getTodos()
         {
             using var client = new HttpClient();
@@ -61,16 +61,18 @@ namespace frontend_WPF
             TableCell titleCell = new TableCell(new Paragraph(new Run(add+title)));
             TableCell contentCell = new TableCell(new Paragraph(new Run(content)));
 
+            titleCell.Padding = new Thickness(8);
+            contentCell.Padding = new Thickness(8);
+            titleCell.BorderThickness= new Thickness(1);
+            titleCell.BorderBrush = border;
+            contentCell.BorderThickness= new Thickness(1);
+            contentCell.BorderBrush= border;
+
             if (isCompleted)
             {
                 titleCell.Foreground = new SolidColorBrush(Colors.White);
                 contentCell.Foreground = new SolidColorBrush(Colors.White);
             }
-
-            titleCell.BorderBrush = Brushes.White;
-            titleCell.BorderThickness = new Thickness(0, 0, 1, 1);
-            contentCell.BorderBrush = Brushes.White;
-            contentCell.BorderThickness = new Thickness(1, 0, 0, 1);
 
             newRow.Cells.Add(titleCell);
             newRow.Cells.Add(contentCell);
@@ -98,12 +100,14 @@ namespace frontend_WPF
 
             flowdoc = flowDocumentReader.Document;
             flowdoc.FontFamily = new FontFamily("Segoe UI");
-            
+            flowDocumentReader.Zoom = 130;
+
             Style windowStyle = new Style(typeof(Window));
 
             windowStyle.Setters.Add(new Setter(Window.BackgroundProperty, background));
             windowStyle.Setters.Add(new Setter(Window.FontFamilyProperty, new FontFamily("Segoe UI")));
             windowStyle.Setters.Add(new Setter(Window.ForegroundProperty, Brushes.White));
+            windowStyle.Setters.Add(new Setter(Window.FontSizeProperty, (double)15));
 
             Style = windowStyle;
         }
@@ -117,12 +121,16 @@ namespace frontend_WPF
             txtIndex.IsEnabled = true;
             txtNewContent.IsEnabled = false;
             txtNewTitle.IsEnabled = false;
+            txtNewTitle.Text = string.Empty;
+            txtNewContent.Text = string.Empty;
         }
         private void Completed_Checked(object sender, RoutedEventArgs e)
         {
             txtIndex.IsEnabled = true;
             txtNewContent.IsEnabled = false;
             txtNewTitle.IsEnabled = false;
+            txtNewTitle.Text = string.Empty;
+            txtNewContent.Text = string.Empty;
         }
         private void Change_Checked(object sender, RoutedEventArgs e)
         {
@@ -144,8 +152,8 @@ namespace frontend_WPF
             }
             else if (Change.IsChecked == true)
             {
-                // Code to be executed when the "Change Data" radio button is selected
-                // Example: MessageBox.Show("Change Data button pressed");
+                await TodoList.alterData(int.Parse(txtIndex.Text), txtNewTitle.Text, txtNewContent.Text);
+                drawTable();
             }
         }
     }

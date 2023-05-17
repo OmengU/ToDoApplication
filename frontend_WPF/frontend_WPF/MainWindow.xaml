@@ -6,6 +6,45 @@
         xmlns:local="clr-namespace:frontend_WPF"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
+
+    <Window.Resources>
+        <SolidColorBrush x:Key="CustomBackgroundColor" Color="#03060b" />
+        <SolidColorBrush x:Key="CustomThumbColor" Color="#222334" />
+        <Style TargetType="ScrollBar">
+            <Setter Property="Background" Value="{StaticResource CustomBackgroundColor}" />
+            <Setter Property="Width" Value="18" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Grid>
+                            <Track x:Name="PART_Track"
+                                   Grid.Column="0"
+                                   IsDirectionReversed="True">
+                                <Track.Thumb>
+                                    <Thumb Background="Transparent">
+                                        <Thumb.Style>
+                                            <Style TargetType="Thumb">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="Thumb">
+                                                            <Border BorderBrush="gray" BorderThickness="1" CornerRadius="2">
+                                                                <Rectangle Fill="{StaticResource CustomThumbColor}" />
+                                                            </Border>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </Thumb.Style>
+                                    </Thumb>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
     <Grid Margin="10">
 
         <Grid.RowDefinitions>
@@ -21,7 +60,8 @@
             <FlowDocument>
                 <Table Name="todotable">
                     <Table.Columns>
-                        <TableColumn Width="1*" />
+                        <TableColumn Width="1*">
+                        </TableColumn>
                         <TableColumn Width="4*" />
                     </Table.Columns>
                     <TableRowGroup Name="group">
@@ -32,19 +72,19 @@
 
 
             <StackPanel Grid.Column="2" Margin="5,0,0,0">
-            <Label Content="Title" IsHitTestVisible="False" Opacity="0.5" />
+            <Label Content="Title" IsHitTestVisible="False" Opacity="0.5" Foreground="White"/>
             <TextBox x:Name="txtTitle"/>
-            <Label Content="Content" IsHitTestVisible="False" Opacity="0.5" />
+            <Label Content="Content" IsHitTestVisible="False" Opacity="0.5" Foreground="White"/>
             <TextBox x:Name="txtContent" />
             <Button x:Name="btnAdd" Margin="0,5,0,0" Click="Button_Click">Add Name</Button>
-            <RadioButton GroupName="mode" Name="Delete" Checked="Delete_Checked">Delete</RadioButton>
-            <RadioButton GroupName="mode" Name="Complete" Checked="Completed_Checked">Set Completed</RadioButton>
-            <RadioButton GroupName="mode" Name="Change" Checked="Change_Checked">Change Data</RadioButton>
-            <Label Content="Index" IsHitTestVisible="False" Opacity="0.5" />
+            <RadioButton GroupName="mode" Name="Delete" Checked="Delete_Checked" Foreground="White">Delete</RadioButton>
+            <RadioButton GroupName="mode" Name="Complete" Checked="Completed_Checked" Foreground="White">Set Completed</RadioButton>
+            <RadioButton GroupName="mode" Name="Change" Checked="Change_Checked" Foreground="White">Change Data</RadioButton>
+            <Label Content="Index" IsHitTestVisible="False" Opacity="0.5" Foreground="White"/>
             <TextBox x:Name="txtIndex" IsEnabled="false"/>
-            <Label Content="Title" IsHitTestVisible="False" Opacity="0.5" />
+            <Label Content="Title" IsHitTestVisible="False" Opacity="0.5" Foreground="White"/>
             <TextBox x:Name="txtNewTitle" IsEnabled="false" />
-            <Label Content="Content" IsHitTestVisible="False" Opacity="0.5" />
+            <Label Content="Content" IsHitTestVisible="False" Opacity="0.5" Foreground="White"/>
             <TextBox x:Name="txtNewContent" IsEnabled="false"/>
             <Button x:Name="btnExecute" Margin="0,5,0,0" Click="Execute_Click">Execute</Button>
         </StackPanel>

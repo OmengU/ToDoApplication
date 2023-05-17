@@ -17,7 +17,7 @@ namespace frontend_WPF
 
         public async Task add(string title, string content) 
         {
-            ToDo toDo = await createToDo(new ToDoDto { Title = title, Content = content });
+            ToDo toDo = await createToDo(new ToDoDto{ Title = title, Content = content});
         }
         public async Task remove(int index)
         {
@@ -27,10 +27,17 @@ namespace frontend_WPF
         {
             if(Todos.Count > 0) await SetComplete(Todos[index].Id);
         }
+        public async Task alterData(int index, string title, string content)
+        {
+            if (Todos.Count > 0) {
+                if (title == string.Empty && content != string.Empty) await ChangeData(Todos[index].Id, new ToDoDto { Title = Todos[index].Title, Content = content });
+                else if (title != string.Empty && content == string.Empty) await ChangeData(Todos[index].Id, new ToDoDto { Title = title, Content = Todos[index].Content });
+                else if (title != string.Empty && content != string.Empty) await ChangeData(Todos[index].Id, new ToDoDto { Title = title, Content = content });
+            }
+        }
         static async Task<ToDo> createToDo(ToDoDto dto)
         {
             using var client = new HttpClient();
-            var headers = new Dictionary<string, string> { { "Content-Type", "application/json" } };
             var jsonBody = JsonConvert.SerializeObject(dto);
 
             try
@@ -82,6 +89,23 @@ namespace frontend_WPF
             catch (Exception ex)
             {
                 throw new Exception("Error marking todo complete: " + ex.Message);
+            }
+        }
+        static async Task<ToDo> ChangeData(Guid id, ToDoDto dto)
+        {
+            using var client = new HttpClient();
+            var jsonBody = JsonConvert.SerializeObject(dto);
+
+            try
+            {
+                var response = await client.PatchAsync($"http://localhost:5161/api/todo/{id}", new StringContent(jsonBody, Encoding.UTF8, "application/json"));
+                response.EnsureSuccessStatusCode();
+                var responseJson = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<ToDo>(responseJson);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error changing todo data: " + ex.Message);
             }
         }
     }
