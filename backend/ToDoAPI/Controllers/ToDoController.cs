@@ -99,7 +99,6 @@ namespace ToDoAPI.Controllers
                 {
                     return NotFound();
                 }
-                await _repository.SetCompleted(id);
                 return Ok(todo);
             }
             catch (Exception ex)
