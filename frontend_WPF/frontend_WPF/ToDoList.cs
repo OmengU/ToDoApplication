@@ -1,8 +1,10 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Formats.Asn1;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,10 +15,17 @@ namespace frontend_WPF
     {
         public List<ToDo> Todos {get; set;}
 
-        public async void add(string title, string content) 
+        public async Task add(string title, string content) 
         {
             ToDo toDo = await createToDo(new ToDoDto { Title = title, Content = content });
-            Todos.Add(toDo);
+        }
+        public async Task remove(int index)
+        {
+            if (Todos.Count > 0) await deleteToDo(Todos[index].Id);
+        }
+        public async Task markComplete(int index)
+        {
+            if(Todos.Count > 0) await SetComplete(Todos[index].Id);
         }
         static async Task<ToDo> createToDo(ToDoDto dto)
         {
@@ -34,6 +43,45 @@ namespace frontend_WPF
             catch (Exception ex)
             {
                 throw new Exception("Error creating todo: " + ex.Message);
+            }
+        }
+        static async Task<bool> deleteToDo(Guid id)
+        {
+            using var client = new HttpClient();
+
+            try
+            {
+                var response = await client.DeleteAsync($"http://localhost:5161/api/todo/{id}");
+                if (response.IsSuccessStatusCode)
+                {
+                    return true;
+                }
+                else
+                {
+                    string error = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine("Delete request failed. Error: " + error);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occurred while sending the delete request: " + ex.Message);
+            }
+            return false;
+        }
+        static async Task<ToDo> SetComplete(Guid id)
+        {
+            using var client = new HttpClient();
+            
+            try
+            {
+                var response = await client.PatchAsync($"http://localhost:5161/api/todo/{id}/complete", null);
+                response.EnsureSuccessStatusCode();
+                var responseJson = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<ToDo>(responseJson);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error marking todo complete: " + ex.Message);
             }
         }
     }

@@ -29,6 +29,8 @@ namespace frontend_WPF
         
         private FlowDocument flowdoc;
         private ToDoList TodoList = new ToDoList();
+        private SolidColorBrush background = new SolidColorBrush(Color.FromRgb(13, 17, 23));
+        private SolidColorBrush secondary = new SolidColorBrush(Color.FromRgb(22, 27, 34));
         static async Task<List<ToDo>> getTodos()
         {
             using var client = new HttpClient();
@@ -49,21 +51,31 @@ namespace frontend_WPF
                 throw new Exception("Failed to retrieve todos from API. Status code: " + response.StatusCode);
             }
         }
-        public void addRow(string title,  string content, TableRowGroup rowGroup)
+        public void addRow(string title,  string content, bool isCompleted, TableRowGroup rowGroup)
         {
             TableRow newRow = new TableRow();
-            rowGroup.Rows.Insert(0, newRow);
+            rowGroup.Rows.Add(newRow);
 
-            TableCell titleCell = new TableCell(new Paragraph(new Run(title)));
+            String add = isCompleted ? "✅ " : "";
+
+            TableCell titleCell = new TableCell(new Paragraph(new Run(add+title)));
             TableCell contentCell = new TableCell(new Paragraph(new Run(content)));
 
-            titleCell.BorderBrush = Brushes.Black;
-            titleCell.BorderThickness = new Thickness(0, 0, 0, 1);
-            contentCell.BorderBrush = Brushes.Black;
-            contentCell.BorderThickness = new Thickness(0, 0, 0, 1);
+            if (isCompleted)
+            {
+                titleCell.Foreground = new SolidColorBrush(Colors.White);
+                contentCell.Foreground = new SolidColorBrush(Colors.White);
+            }
+
+            titleCell.BorderBrush = Brushes.White;
+            titleCell.BorderThickness = new Thickness(0, 0, 1, 1);
+            contentCell.BorderBrush = Brushes.White;
+            contentCell.BorderThickness = new Thickness(1, 0, 0, 1);
 
             newRow.Cells.Add(titleCell);
             newRow.Cells.Add(contentCell);
+
+            if (isCompleted) newRow.Background = secondary;
         }
         public async void drawTable()
         {
@@ -72,9 +84,10 @@ namespace frontend_WPF
 
             Table todoTable = flowdoc.FindName("todotable") as Table;
             TableRowGroup rowGroup = todoTable.FindName("group") as TableRowGroup;
+            rowGroup.Rows.Clear();
             foreach(ToDo todo in TodoList.Todos)
             {
-                addRow(todo.Title, todo.Content, rowGroup);
+                addRow(todo.Title, todo.Content, todo.IsCompleted, rowGroup);
             }
 
         }
@@ -84,15 +97,56 @@ namespace frontend_WPF
             drawTable();
 
             flowdoc = flowDocumentReader.Document;
-            flowdoc.FontFamily = new FontFamily("Comic Sans MS");
-        }
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            TodoList.add(txtTitle.Text, txtContent.Text);
+            flowdoc.FontFamily = new FontFamily("Segoe UI");
+            
+            Style windowStyle = new Style(typeof(Window));
 
-            Table todoTable = flowdoc.FindName("todotable") as Table;
-            TableRowGroup rowGroup = todoTable.FindName("group") as TableRowGroup;
-            addRow(txtTitle.Text, txtContent.Text, rowGroup);
+            windowStyle.Setters.Add(new Setter(Window.BackgroundProperty, background));
+            windowStyle.Setters.Add(new Setter(Window.FontFamilyProperty, new FontFamily("Segoe UI")));
+            windowStyle.Setters.Add(new Setter(Window.ForegroundProperty, Brushes.White));
+
+            Style = windowStyle;
+        }
+        private async void Button_Click(object sender, RoutedEventArgs e)
+        {
+            await TodoList.add(txtTitle.Text, txtContent.Text);
+            drawTable();
+        }
+        private void Delete_Checked(object sender, RoutedEventArgs e)
+        {
+            txtIndex.IsEnabled = true;
+            txtNewContent.IsEnabled = false;
+            txtNewTitle.IsEnabled = false;
+        }
+        private void Completed_Checked(object sender, RoutedEventArgs e)
+        {
+            txtIndex.IsEnabled = true;
+            txtNewContent.IsEnabled = false;
+            txtNewTitle.IsEnabled = false;
+        }
+        private void Change_Checked(object sender, RoutedEventArgs e)
+        {
+            txtIndex.IsEnabled = true;
+            txtNewContent.IsEnabled = true;
+            txtNewTitle.IsEnabled = true;
+        }
+        private async void Execute_Click(object sender, RoutedEventArgs e)
+        {
+            if (Delete.IsChecked == true)
+            {
+                await TodoList.remove(int.Parse(txtIndex.Text));
+                drawTable();
+            }
+            else if (Complete.IsChecked == true)
+            {
+                await TodoList.markComplete(int.Parse(txtIndex.Text));
+                drawTable();
+            }
+            else if (Change.IsChecked == true)
+            {
+                // Code to be executed when the "Change Data" radio button is selected
+                // Example: MessageBox.Show("Change Data button pressed");
+            }
         }
     }
     

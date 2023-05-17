@@ -37,6 +37,16 @@
             <Label Content="Content" IsHitTestVisible="False" Opacity="0.5" />
             <TextBox x:Name="txtContent" />
             <Button x:Name="btnAdd" Margin="0,5,0,0" Click="Button_Click">Add Name</Button>
+            <RadioButton GroupName="mode" Name="Delete" Checked="Delete_Checked">Delete</RadioButton>
+            <RadioButton GroupName="mode" Name="Complete" Checked="Completed_Checked">Set Completed</RadioButton>
+            <RadioButton GroupName="mode" Name="Change" Checked="Change_Checked">Change Data</RadioButton>
+            <Label Content="Index" IsHitTestVisible="False" Opacity="0.5" />
+            <TextBox x:Name="txtIndex" IsEnabled="false"/>
+            <Label Content="Title" IsHitTestVisible="False" Opacity="0.5" />
+            <TextBox x:Name="txtNewTitle" IsEnabled="false" />
+            <Label Content="Content" IsHitTestVisible="False" Opacity="0.5" />
+            <TextBox x:Name="txtNewContent" IsEnabled="false"/>
+            <Button x:Name="btnExecute" Margin="0,5,0,0" Click="Execute_Click">Execute</Button>
         </StackPanel>
 
 
