@@ -4,17 +4,11 @@ namespace ToDoAPI.Models
 {
     public class ToDoRepository : IToDoRepository
     {
-        public IEnumerable<ToDo> All => throw new NotImplementedException();
         private readonly ToDoManagementDbContext _context;
 
         public ToDoRepository(ToDoManagementDbContext context)
         {
             _context = context;
-        }
-
-        public void AddToDo(ToDo toDo)
-        {
-            _context.ToDos.Add(toDo);
         }
 
         public async Task<ToDo> CreateToDo(ToDoDto dto)
@@ -26,7 +20,7 @@ namespace ToDoAPI.Models
                 IsCompleted = false,
                 CreationDate = DateTime.Now.ToUniversalTime(),
             };
-            AddToDo(toDo);
+            _context.ToDos.Add(toDo);
             await _context.SaveChangesAsync();
             return toDo;
         }

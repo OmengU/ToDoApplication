@@ -11,7 +11,6 @@ namespace ToDoAPI.Models
         public string Title { get; set; }
         public string Content { get; set; }
         public bool IsCompleted { get; set; }
-
         public DateTime CreationDate { get; set; }
     }
 }
