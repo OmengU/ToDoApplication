@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +12,10 @@ namespace frontend_WPF
     {
         public List<ToDo> Todos {get; set;}
 
+        public async Task initialize()
+        {
+            Todos = await getTodos();
+        }
         public async Task add(string title, string content) 
         {
             ToDo toDo = await createToDo(new ToDoDto{ Title = title, Content = content});
@@ -29,6 +34,26 @@ namespace frontend_WPF
                 if (title == string.Empty && content != string.Empty) await ChangeData(Todos[index].Id, new ToDoDto { Title = Todos[index].Title, Content = content });
                 else if (title != string.Empty && content == string.Empty) await ChangeData(Todos[index].Id, new ToDoDto { Title = title, Content = Todos[index].Content });
                 else if (title != string.Empty && content != string.Empty) await ChangeData(Todos[index].Id, new ToDoDto { Title = title, Content = content });
+            }
+        }
+        static async Task<List<ToDo>> getTodos()
+        {
+            using var client = new HttpClient();
+
+            HttpResponseMessage response = await client.GetAsync("http://localhost:5161/api/todo");
+
+            if (response.IsSuccessStatusCode)
+            {
+                string jsonString = await response.Content.ReadAsStringAsync();
+                Console.WriteLine(jsonString);
+
+                List<ToDo> data = JsonConvert.DeserializeObject<List<ToDo>>(jsonString);
+                return data;
+            }
+            else
+            {
+                Console.WriteLine("Error: " + response.StatusCode);
+                throw new Exception("Failed to retrieve todos from API. Status code: " + response.StatusCode);
             }
         }
         static async Task<ToDo> createToDo(ToDoDto dto)

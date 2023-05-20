@@ -1,8 +1,4 @@
 ﻿using System;
-using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
@@ -14,30 +10,11 @@ namespace frontend_WPF
         
         
         private FlowDocument flowdoc;
-        private ToDoList TodoList = new ToDoList();
+        private ToDoList todos = new ToDoList();
         private SolidColorBrush background = new SolidColorBrush(Color.FromRgb(13, 17, 23));
         private SolidColorBrush secondary = new SolidColorBrush(Color.FromRgb(22, 27, 34));
         private SolidColorBrush border = new SolidColorBrush(Color.FromRgb(145, 126, 126));
-        static async Task<List<ToDo>> getTodos()
-        {
-            using var client = new HttpClient();
-
-            HttpResponseMessage response = await client.GetAsync("http://localhost:5161/api/todo");
-
-            if (response.IsSuccessStatusCode)
-            {
-                string jsonString = await response.Content.ReadAsStringAsync();
-                Console.WriteLine(jsonString);
-
-                List<ToDo> data = JsonConvert.DeserializeObject<List<ToDo>>(jsonString);
-                return data;
-            }
-            else
-            {
-                Console.WriteLine("Error: " + response.StatusCode);
-                throw new Exception("Failed to retrieve todos from API. Status code: " + response.StatusCode);
-            }
-        }
+        
         public void addRow(string title,  string content, bool isCompleted, TableRowGroup rowGroup)
         {
             TableRow newRow = new TableRow();
@@ -68,17 +45,15 @@ namespace frontend_WPF
         }
         public async void drawTable()
         {
-            List<ToDo> todos = await getTodos();
-            TodoList.Todos = todos;
+            await todos.initialize();
 
             Table todoTable = flowdoc.FindName("todotable") as Table;
             TableRowGroup rowGroup = todoTable.FindName("group") as TableRowGroup;
             rowGroup.Rows.Clear();
-            foreach(ToDo todo in TodoList.Todos)
+            foreach(ToDo todo in todos.Todos)
             {
                 addRow(todo.Title, todo.Content, todo.IsCompleted, rowGroup);
             }
-
         }
         public MainWindow()
         {
@@ -100,7 +75,7 @@ namespace frontend_WPF
         }
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            await TodoList.add(txtTitle.Text, txtContent.Text);
+            await todos.add(txtTitle.Text, txtContent.Text);
             drawTable();
         }
         private void Delete_Checked(object sender, RoutedEventArgs e)
@@ -129,17 +104,17 @@ namespace frontend_WPF
         {
             if (Delete.IsChecked == true)
             {
-                await TodoList.remove(int.Parse(txtIndex.Text));
+                await todos.remove(int.Parse(txtIndex.Text));
                 drawTable();
             }
             else if (Complete.IsChecked == true)
             {
-                await TodoList.markComplete(int.Parse(txtIndex.Text));
+                await todos.markComplete(int.Parse(txtIndex.Text));
                 drawTable();
             }
             else if (Change.IsChecked == true)
             {
-                await TodoList.alterData(int.Parse(txtIndex.Text), txtNewTitle.Text, txtNewContent.Text);
+                await todos.alterData(int.Parse(txtIndex.Text), txtNewTitle.Text, txtNewContent.Text);
                 drawTable();
             }
         }
