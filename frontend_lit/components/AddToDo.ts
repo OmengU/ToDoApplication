@@ -31,6 +31,7 @@ export class AddToDo extends LitElement{
       border-radius: 15px;
       padding: 0.3rem .5rem;
       font-size: 1rem;
+      resize: vertical;
     }
     .container{
       display: grid;
