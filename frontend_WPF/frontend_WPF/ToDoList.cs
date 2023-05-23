@@ -22,15 +22,15 @@ namespace frontend_WPF
         }
         public async Task remove(int index)
         {
-            if (Todos.Count > 0) await deleteToDo(Todos[index].Id);
+            if (Todos.Count > 0 && index < Todos.Count) await deleteToDo(Todos[index].Id);
         }
         public async Task markComplete(int index)
         {
-            if(Todos.Count > 0) await SetComplete(Todos[index].Id);
+            if(Todos.Count > 0 && index < Todos.Count) await SetComplete(Todos[index].Id);
         }
         public async Task alterData(int index, string title, string content)
         {
-            if (Todos.Count > 0) {
+            if (Todos.Count > 0 && index < Todos.Count) {
                 if (title == string.Empty && content != string.Empty) await ChangeData(Todos[index].Id, new ToDoDto { Title = Todos[index].Title, Content = content });
                 else if (title != string.Empty && content == string.Empty) await ChangeData(Todos[index].Id, new ToDoDto { Title = title, Content = Todos[index].Content });
                 else if (title != string.Empty && content != string.Empty) await ChangeData(Todos[index].Id, new ToDoDto { Title = title, Content = content });
