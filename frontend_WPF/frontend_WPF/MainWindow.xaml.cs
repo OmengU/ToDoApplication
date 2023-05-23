@@ -76,6 +76,7 @@ namespace frontend_WPF
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
             await todos.add(txtTitle.Text, txtContent.Text);
+            txtContent.Text = txtTitle.Text = "";
             drawTable();
         }
         private void Delete_Checked(object sender, RoutedEventArgs e)

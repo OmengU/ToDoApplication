@@ -75,7 +75,7 @@
             <Label Content="Title" IsHitTestVisible="False" Opacity="0.5" Foreground="White"/>
             <TextBox x:Name="txtTitle"/>
             <Label Content="Content" IsHitTestVisible="False" Opacity="0.5" Foreground="White"/>
-            <TextBox x:Name="txtContent" />
+            <TextBox x:Name="txtContent"/>
             <Button x:Name="btnAdd" Margin="0,5,0,0" Click="Button_Click">Add Todo</Button>
             <RadioButton GroupName="mode" Name="Delete" Checked="Delete_Checked" Foreground="White">Delete</RadioButton>
             <RadioButton GroupName="mode" Name="Complete" Checked="Completed_Checked" Foreground="White">Set Completed</RadioButton>
