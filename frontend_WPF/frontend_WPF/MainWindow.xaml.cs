@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
@@ -75,9 +76,16 @@ namespace frontend_WPF
         }
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            await todos.add(txtTitle.Text, txtContent.Text);
-            txtContent.Text = txtTitle.Text = "";
-            drawTable();
+            if(txtTitle.Text != String.Empty && txtContent.Text != String.Empty)
+            {
+                await todos.add(txtTitle.Text, txtContent.Text);
+                txtContent.Text = txtTitle.Text = "";
+                drawTable();
+            }
+            else
+            {
+                MessageBox.Show($"Please enter both a title and content", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
         }
         private void Delete_Checked(object sender, RoutedEventArgs e)
         {
@@ -103,7 +111,15 @@ namespace frontend_WPF
         }
         private async void Execute_Click(object sender, RoutedEventArgs e)
         {
-            if (Delete.IsChecked == true)
+            if(!Regex.IsMatch(txtIndex.Text, @"^\d+$"))
+            {
+                MessageBox.Show($"{txtIndex.Text} is not a number. Enter a valid number", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            else if(int.Parse(txtIndex.Text) > todos.Todos.Count -1)
+            {
+                MessageBox.Show($"{txtIndex.Text} is not a valid index. Please enter a number that is lower than the number of ToDos", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            else if (Delete.IsChecked == true)
             {
                 await todos.remove(int.Parse(txtIndex.Text));
                 drawTable();
