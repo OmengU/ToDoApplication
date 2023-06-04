@@ -6,3 +6,4 @@ frontend_WPF/.vs
 .parcel-cache/
 dist/
 node_modules/
+*.sty
