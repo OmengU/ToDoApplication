@@ -1,39 +1,62 @@
 using Microsoft.EntityFrameworkCore;
 using ToDoAPI.Models;
 
-string? dbHostString = Environment.GetEnvironmentVariable("db_host_string");
-
-var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddHealthChecks();
-
-
-builder.Services.AddScoped<IToDoRepository, ToDoRepository>();
-builder.Services.AddDbContext<ToDoManagementDbContext>(options =>
+public class Program
 {
-    string? connectionString = dbHostString != null ? dbHostString : builder.Configuration["ConnectionStrings:ToDoManagementDbContextConnection"];
-    options.UseNpgsql(connectionString);
-});
+    public static void Main(string[] args)
+    {
+        CreateHostBuilder(args).Build().Run();
+    }
 
-var app = builder.Build();
+    public static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.ConfigureServices((hostContext, services) =>
+                {
+                    services.AddControllers();
+                    services.AddEndpointsApiExplorer();
+                    services.AddSwaggerGen();
+                    services.AddHealthChecks();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
+                    services.AddScoped<IToDoRepository, ToDoRepository>();
+                    services.AddDbContext<ToDoManagementDbContext>(options =>
+                    {
+                        string? connectionString = Environment.GetEnvironmentVariable("db_host_string") ?? hostContext.Configuration["ConnectionStrings:ToDoManagementDbContextConnection"];
+                        options.UseNpgsql(connectionString);
+                    });
+
+                    // Configure CORS
+                    services.AddCors(options =>
+                    {
+                        options.AddDefaultPolicy(builder =>
+                        {
+                            builder.WithOrigins("http://localhost:1234")
+                                   .AllowAnyMethod()
+                                   .AllowAnyHeader();
+                        });
+                    });
+                });
+
+                webBuilder.Configure((hostContext, app) =>
+                {
+                    if (hostContext.HostingEnvironment.IsDevelopment())
+                    {
+                        app.UseSwagger();
+                        app.UseSwaggerUI();
+                    }
+
+                    app.UseRouting();
+
+                    app.UseCors();
+
+                    app.UseAuthorization();
+
+                    app.UseEndpoints(endpoints =>
+                    {
+                        endpoints.MapControllers();
+                        endpoints.MapHealthChecks("/healthz");
+                    });
+                });
+            });
 }
-
-// Configure the HTTP request pipeline.
-
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.MapHealthChecks("/healthz");
-
-app.Run();
