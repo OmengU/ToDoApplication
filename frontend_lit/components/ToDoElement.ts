@@ -160,8 +160,13 @@ export class ToDoElement extends LitElement{
     }
     handleEdit(event: SubmitEvent) {
       event.preventDefault();
-      this.dispatchEvent(new CustomEvent('edit-event', {detail: {id: this.id, title: this.title, content: this.content}, bubbles: true, composed: true }));
-      this.isediting = false;
+      if(this.title != "" && this.content != "") {
+        this.dispatchEvent(new CustomEvent('edit-event', {detail: {id: this.id, title: this.title, content: this.content}, bubbles: true, composed: true }));
+        this.isediting = false;
+      } else{
+        this.handleToggleEdit()
+        this.dispatchEvent(new CustomEvent('error-event', {bubbles: true, composed: true}));
+      }
   }
 
     render() {

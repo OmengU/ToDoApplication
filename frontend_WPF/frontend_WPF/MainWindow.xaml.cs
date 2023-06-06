@@ -51,9 +51,12 @@ namespace frontend_WPF
             Table todoTable = flowdoc.FindName("todotable") as Table;
             TableRowGroup rowGroup = todoTable.FindName("group") as TableRowGroup;
             rowGroup.Rows.Clear();
-            foreach(ToDo todo in todos.Todos)
+            if(todos.Todos != null)
             {
-                addRow(todo.Title, todo.Content, todo.IsCompleted, rowGroup);
+                foreach (ToDo todo in todos.Todos)
+                {
+                    addRow(todo.Title, todo.Content, todo.IsCompleted, rowGroup);
+                }
             }
         }
         public MainWindow()

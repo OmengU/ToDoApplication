@@ -1,6 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { ToDo, URL } from './global'
+import { ToDo, URL} from './global'
 
 async function getToDos(): Promise<ToDo[]> {
   const response = await fetch(URL);
@@ -54,7 +54,7 @@ export class MainComponent extends LitElement {
       align-items: center;
       flex-direction: column;
       gap: 1rem;
-      width: 100%
+      width: 100%;
   }
   .content {
     width: 50%;
@@ -78,6 +78,49 @@ export class MainComponent extends LitElement {
   }
   h1{
     margin: 0;
+  }
+  dialog{
+    position: absolute;
+    top: 50%;
+    left: .5vw;
+    background: var(--secondary-background-color);
+    border: 2px solid var(--accent-color);
+    border-radius: 15px;
+    color: var(--text-color);
+    padding: 1rem;
+    z-index: 100;
+  }
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(10px);
+    z-index: 99;
+  }
+  .closeDialogContainer{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .closeDialogContainer > p {
+    margin: 0;
+    font-size: 2rem;
+  }
+  .closeDialogButton{
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 1rem;
+    height: 1.5rem;
+  }
+  .closeDialogButton:hover{
+    background-color: #f92f60;
+    border-radius: 15px;
+    color: transparent;
+    text-shadow: 0 0 0 white;
+    transition: background-color 400ms, color 400ms, text-shadow 600ms, border-radius 400ms;
   }
   @media (max-width: 768px) {
     .content {
@@ -113,19 +156,40 @@ export class MainComponent extends LitElement {
     console.log("handling edit event");
     await updateToDoData(event.detail.id, {title: event.detail.title, content: event.detail.content})
   }
+  handleErrorEvent(event: CustomEvent){
+    console.log("handling error");
+    this.hasError = true;
+  }
 
   @property({ type: Boolean }) isLoadingGet: boolean = true;
+  @property({ type: Boolean }) hasError: boolean = false;
   @property({ type: Array }) todos: ToDo[] = [];
 
   async connectedCallback(): Promise<void> {
     super.connectedCallback();
-    this.todos = await getToDos();
-    this.isLoadingGet = false;
+    try{
+      this.todos = await getToDos();
+    }catch(e){
+      console.log("ToDos could not be loaded");
+      this.hasError = true;
+    }
+    if(this.todos.length > 0) this.isLoadingGet = false;
   }
 
   render() {
-    if (this.isLoadingGet) return html`<p>Loading...</p>`
+    if (this.isLoadingGet) return html`
+      <p>Loading...</p>
+      ${this.hasError ? html`<div class="overlay"></div>` : ''}
+        <dialog ?open=${this.hasError}>
+          <div class="closeDialogContainer">
+            <p>⚠️</p>
+            <button class="closeDialogButton" @click="${() => {this.hasError = false}}">❌</button>
+          </div>
+          <p>ToDos could not be loaded<p>
+        </dialog>
+      `
     return html`
+    ${this.hasError ? html`<div class="overlay"></div>` : ''}
       <div class="container">
         <div class="content">
           <div class="header">
@@ -137,8 +201,15 @@ export class MainComponent extends LitElement {
                 <theme-switcher></theme-switcher>
               </div>
             </div>
-            <add-todo @add-event=${this.handleAddEvent}></add-todo>
-            <todo-list @delete-event=${this.handleDeleteEvent} @check-event=${this.handleCheckEvent} @edit-event=${this.handleEditEvent} .todos=${this.todos}></todo-list>
+            <add-todo @add-event=${this.handleAddEvent} @error-event=${this.handleErrorEvent}></add-todo>
+            <dialog ?open=${this.hasError}>
+              <div class="closeDialogContainer">
+                <p>⚠️</p>
+                <button class="closeDialogButton" @click="${() => {this.hasError = false}}">❌</button>
+              </div>
+              <p>ToDos must contain both a title and content!!<p>
+            </dialog>
+            <todo-list @delete-event=${this.handleDeleteEvent} @check-event=${this.handleCheckEvent} @edit-event=${this.handleEditEvent} @error-event=${this.handleErrorEvent} .todos=${this.todos}></todo-list>
           </div>
       </div>
     `;

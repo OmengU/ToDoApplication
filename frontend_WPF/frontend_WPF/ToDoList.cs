@@ -5,6 +5,7 @@ using System.ComponentModel.Design;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace frontend_WPF
 {
@@ -40,21 +41,29 @@ namespace frontend_WPF
         {
             using var client = new HttpClient();
 
-            HttpResponseMessage response = await client.GetAsync("http://localhost:5161/api/todo");
-
-            if (response.IsSuccessStatusCode)
+            try
             {
-                string jsonString = await response.Content.ReadAsStringAsync();
-                Console.WriteLine(jsonString);
+                HttpResponseMessage response = await client.GetAsync("http://localhost:5161/api/todo");
+                if (response.IsSuccessStatusCode)
+                {
+                    string jsonString = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine(jsonString);
 
-                List<ToDo> data = JsonConvert.DeserializeObject<List<ToDo>>(jsonString);
-                return data;
+                    List<ToDo> data = JsonConvert.DeserializeObject<List<ToDo>>(jsonString);
+                    return data;
+                }
+                else
+                {
+                    Console.WriteLine("Error: " + response.StatusCode);
+                    throw new Exception("Failed to retrieve todos from API. Status code: " + response.StatusCode);
+                }
             }
-            else
+            catch(Exception ex)
             {
-                Console.WriteLine("Error: " + response.StatusCode);
-                throw new Exception("Failed to retrieve todos from API. Status code: " + response.StatusCode);
+                await Console.Out.WriteLineAsync("Todos could not be loaded");
+                MessageBox.Show("Todos could not be loaded", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+            return null;
         }
         static async Task<ToDo> createToDo(ToDoDto dto)
         {

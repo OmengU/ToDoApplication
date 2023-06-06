@@ -87,9 +87,11 @@ export class AddToDo extends LitElement{
         if(this.title.length > 0 && this.content.length > 0){
           const data = await createToDo({title: this.title, content: this.content});
           this.dispatchEvent(new CustomEvent('add-event', { detail: data }));
-          this.title = "";
-          this.content = "";
+        } else{
+          this.dispatchEvent(new CustomEvent('error-event'));
         }
+        this.title = "";
+        this.content = "";
     }
 
 render() {
